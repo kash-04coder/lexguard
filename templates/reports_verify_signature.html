@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Verify Report Signature - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Case Report Integrity Verification</h1></div>
+
+{% if signed_cases %}
+<div class="card">
+    <form method="get" action="/reports/verify-signature">
+        <label>Select Signed Case</label>
+        <select name="case_id" onchange="this.form.submit()">
+            {% for c in signed_cases %}
+            <option value="{{ c.case_id }}" {{ 'selected' if c.case_id==selected.case_id }}>{{ c.case_id }} - {{ c.case_name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <p><b>Case ID:</b> {{ selected.case_id }}</p>
+    <p><b>Case Name:</b> {{ selected.case_name }}</p>
+    <p><b>Status:</b> {{ selected.status }}</p>
+    <p><b>Signed At:</b> {{ selected.report_signed_at }}</p>
+    <h3>Stored HMAC-SHA256 Signature</h3>
+    <div class="info" style="font-family:monospace;word-break:break-all;">{{ selected.report_signature }}</div>
+    <form method="post" action="/reports/verify-signature/verify" style="margin-top:16px;">
+        <input type="hidden" name="case_id" value="{{ selected.case_id }}">
+        <button type="submit">🔍 Verify Report Integrity</button>
+    </form>
+</div>
+
+{% if result == 'valid' %}
+<div class="success">✅ REPORT INTEGRITY VERIFIED<br>The current case data matches the cryptographically authenticated case summary.</div>
+{% elif result == 'invalid' %}
+<div class="error">🚨 REPORT INTEGRITY COMPROMISED<br>The current case data no longer matches the stored HMAC signature.</div>
+{% endif %}
+{% else %}
+<div class="info">No cryptographically signed cases are available.</div>
+{% endif %}
+{% endblock %}

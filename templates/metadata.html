@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Metadata Analysis - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Metadata Analysis</h1></div>
+
+{% if evidence_list %}
+<div class="card">
+    <form method="get" action="/metadata">
+        <label>Select Evidence</label>
+        <select name="evidence_id" onchange="this.form.submit()">
+            {% for e in evidence_list %}
+            <option value="{{ e.id }}" {{ 'selected' if e.id==selected_id }}>{{ e.id }} - {{ e.title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Extract Metadata</button>
+    </form>
+</div>
+
+{% if metadata %}
+<div class="success">Extracted {{ metadata|length }} metadata fields.</div>
+<div class="card">
+    <table>
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+        {% for k, v in metadata.items() %}
+            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="/metadata/export?evidence_id={{ selected_id }}"><button type="button" onclick="window.location.href=this.parentElement.href">Download metadata as CSV</button></a>
+</div>
+{% endif %}
+{% else %}
+<div class="info">No evidence is available for metadata analysis yet.</div>
+{% endif %}
+{% endblock %}

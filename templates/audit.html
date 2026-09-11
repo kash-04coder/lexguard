@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Audit Logs - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Audit Logs</h1></div>
+<div class="card">
+    <table>
+        <thead><tr><th>ID</th><th>Username</th><th>Action</th><th>Timestamp</th></tr></thead>
+        <tbody>
+        {% for l in logs %}
+            <tr><td>{{ l.id }}</td><td>{{ l.username }}</td><td>{{ l.action }}</td><td>{{ l.timestamp }}</td></tr>
+        {% else %}
+            <tr><td colspan="4">No audit log entries.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% if verification %}
+<div class="verification-badge {% if verification.risk_level == 'HIGH' %}danger{% elif verification.risk_level == 'MEDIUM' %}warning{% else %}safe{% endif %}">
+    <strong>Forensic Status: {{ verification.status }}</strong>
+    <span>Risk: {{ verification.risk_level }} ({{ verification.risk_score }}/100)</span>
+</div>
+{% endif %}

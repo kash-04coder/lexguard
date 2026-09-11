@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Evidence Details - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Evidence Details</h1></div>
+
+<div class="card">
+    <form method="get" action="/evidence/details">
+        <label>Select Evidence</label>
+        <select name="evidence_id" onchange="this.form.submit()">
+            {% for e in evidence_list %}
+            <option value="{{ e.id }}" {{ 'selected' if e.id==selected_id }}>{{ e.id }} - {{ e.title }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if evidence %}
+<div class="card">
+    <h3 style="margin-top:0;">Basic Information</h3>
+    <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:250px;">
+            <p><b>Case ID:</b> {{ evidence.case_id }}</p>
+            <p><b>Title:</b> {{ evidence.title }}</p>
+            <p><b>Uploaded By:</b> {{ evidence.uploaded_by }}</p>
+        </div>
+        <div style="flex:1;min-width:250px;">
+            <p><b>Upload Time:</b> {{ evidence.upload_time }}</p>
+            <p><b>Filename:</b> {{ evidence.filename }}</p>
+            <p><b>SHA256:</b> <code>{{ evidence.sha256[:32] }}...</code></p>
+        </div>
+    </div>
+</div>
+<div class="metric-row">
+    <div class="metric-card"><div class="label">Encryption</div><div class="value" style="font-size:16px;">Enabled</div></div>
+    <div class="metric-card"><div class="label">Status</div><div class="value" style="font-size:16px;">{{ status }}</div></div>
+    <div class="metric-card"><div class="label">Alerts</div><div class="value">{{ alerts|length }}</div></div>
+    <div class="metric-card"><div class="label">Custody</div><div class="value">{{ custody|length }}</div></div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Evidence Preview</h3>
+    {% if preview_type == 'image' %}
+        <img src="/evidence/preview?evidence_id={{ evidence.id }}" style="max-width:500px;border-radius:10px;">
+    {% elif preview_type == 'text' %}
+        <pre style="background:#0f172a;padding:16px;border-radius:10px;overflow-x:auto;">{{ preview_text }}</pre>
+    {% elif preview_type == 'pdf' %}
+        <a href="/evidence/preview?evidence_id={{ evidence.id }}"><button type="button">Download PDF</button></a>
+    {% elif preview_type == 'error' %}
+        <div class="warning">Could not decrypt evidence for preview.</div>
+    {% else %}
+        <div class="warning">Preview not available for this file type.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Chain of Custody</h3>
+    <table>
+        <thead><tr><th>Timestamp</th><th>Action</th><th>Person</th></tr></thead>
+        <tbody>
+        {% for c in custody %}
+            <tr><td>{{ c.timestamp }}</td><td>{{ c.action }}</td><td>{{ c.person }}</td></tr>
+        {% else %}
+            <tr><td colspan="3">No custody records.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Evidence Activity IP Logs</h3>
+    {% if ip_logs %}
+    <table>
+        <thead><tr><th>User</th><th>Action</th><th>IP</th><th>Time</th></tr></thead>
+        <tbody>
+        {% for i in ip_logs %}
+            <tr><td>{{ i.username }}</td><td>{{ i.action }}</td><td>{{ i.ip_address }}</td><td>{{ i.timestamp }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="info">No IP activity has been recorded for this evidence yet.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Tamper Alerts</h3>
+    <table>
+        <thead><tr><th>Detection Time</th><th>Severity</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for a in alerts %}
+            <tr><td>{{ a.detection_time }}</td><td>{{ a.severity }}</td><td>{{ a.status }}</td></tr>
+        {% else %}
+            <tr><td colspan="3">No tamper alerts.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% elif evidence_list %}
+<div class="error">Evidence not found.</div>
+{% else %}
+<div class="info">No evidence has been uploaded yet.</div>
+{% endif %}
+{% endblock %}

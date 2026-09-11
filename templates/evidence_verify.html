@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Verify Evidence - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Evidence Integrity Verification</h1></div>
+
+{% if message %}<div class="{{ message_type }}">{{ message }}</div>{% endif %}
+
+{% if evidence_list %}
+<div class="card">
+    <form method="post" action="/evidence/verify/run">
+        <label>Select Evidence</label>
+        <select name="evidence_id">
+            {% for e in evidence_list %}
+            <option value="{{ e.id }}">{{ e.id }} - {{ e.title }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Verify Evidence</button>
+    </form>
+</div>
+{% else %}
+<div class="info">No evidence is available to verify yet.</div>
+{% endif %}
+{% endblock %}

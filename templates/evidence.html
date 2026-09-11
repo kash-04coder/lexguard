@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Evidence - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Evidence</h1></div>
+
+<div class="card">
+    <form method="get" action="/evidence">
+        <label>Search Evidence</label>
+        <input type="text" name="search_term" value="{{ search_term or '' }}"
+               placeholder="Case ID, title, filename, uploader, or SHA256">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+{% if search_term %}
+    {% if search_results %}
+    <div class="success">{{ search_results|length }} result(s) found</div>
+    <div class="card">
+        <table>
+            <thead><tr><th>ID</th><th>Case</th><th>Title</th><th>Filename</th><th>Uploaded By</th><th>Upload Time</th><th></th></tr></thead>
+            <tbody>
+            {% for r in search_results %}
+                <tr>
+                    <td>{{ r.id }}</td><td>{{ r.case_id }}</td><td>{{ r.title }}</td>
+                    <td>{{ r.filename }}</td><td>{{ r.uploaded_by }}</td><td>{{ r.upload_time }}</td>
+                    <td><a href="/evidence?evidence_id={{ r.id }}">View</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="warning">No matching evidence found</div>
+    {% endif %}
+{% endif %}
+
+{% if evidence_list %}
+<div class="card">
+    <label>Select Evidence</label>
+    <select name="evidence_id" onchange="window.location.href='/evidence?evidence_id='+this.value">
+        {% for e in evidence_list %}
+        <option value="{{ e.id }}" {{ 'selected' if e.id==selected_id }}>{{ e.id }} - {{ e.title }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% else %}
+<div class="info">No evidence has been uploaded yet.</div>
+{% endif %}
+
+{% if evidence %}
+<div class="card">
+    <h3 style="margin-top:0;">Basic Information</h3>
+    <div style="display:flex;gap:30px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:250px;">
+            <p><b>Case ID:</b> {{ evidence.case_id }}</p>
+            <p><b>Title:</b> {{ evidence.title }}</p>
+            <p><b>Uploaded By:</b> {{ evidence.uploaded_by }}</p>
+        </div>
+        <div style="flex:1;min-width:250px;">
+            <p><b>Upload Time:</b> {{ evidence.upload_time }}</p>
+            <p><b>Filename:</b> {{ evidence.filename }}</p>
+            <p><b>SHA256:</b> <code>{{ evidence.sha256[:32] }}...</code></p>
+        </div>
+    </div>
+</div>
+<div class="metric-row">
+    <div class="metric-card"><div class="label">Encryption</div><div class="value" style="font-size:16px;">Enabled</div></div>
+    <div class="metric-card"><div class="label">Status</div><div class="value" style="font-size:16px;">{{ status }}</div></div>
+    <div class="metric-card"><div class="label">Alerts</div><div class="value">{{ alerts_count }}</div></div>
+    <div class="metric-card"><div class="label">Custody</div><div class="value">{{ custody_count }}</div></div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Evidence Preview</h3>
+    {% if preview_type == 'image' %}
+        <img src="/evidence/preview?evidence_id={{ evidence.id }}" style="max-width:500px;border-radius:10px;">
+    {% elif preview_type == 'text' %}
+        <pre style="background:#0f172a;padding:16px;border-radius:10px;overflow-x:auto;">{{ preview_text }}</pre>
+    {% elif preview_type == 'pdf' %}
+        <a href="/evidence/preview?evidence_id={{ evidence.id }}"><button type="button" onclick="window.location.href=this.parentElement.href">Download PDF</button></a>
+    {% elif preview_type == 'error' %}
+        <div class="warning">Could not decrypt evidence for preview.</div>
+    {% else %}
+        <div class="warning">Preview not available for this file type.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Timeline</h3>
+    <p style="color:#93c5fd;">Registration, custody, verification and tamper events, in order, each with the IP address recorded at the time.</p>
+    {% for row in timeline %}
+        <div class="{{ row.css_class }}">
+            <h3 style="margin:0 0 6px 0;">{{ row.icon }} {{ row.event }}</h3>
+            👤 <b>{{ row.user }}</b><br>
+            🌐 IP Address: {{ row.ip_address }}<br>
+            🕒 <b>{{ row.time }}</b>
+        </div>
+    {% else %}
+        <div class="info">No timeline events recorded for this evidence yet.</div>
+    {% endfor %}
+</div>
+{% elif evidence_list and selected_id %}
+<div class="error">Evidence not found.</div>
+{% endif %}
+{% endblock %}

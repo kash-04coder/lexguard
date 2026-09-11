@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{% block title %}LexGuard{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% if user %}
+<div class="sidebar">
+    <h2 style="color:white;font-size:18px;margin-bottom:20px;">🔐 LexGuard</h2>
+    <a href="/dashboard" class="{{ 'active' if active=='dashboard' }}">Dashboard</a>
+    <a href="/documents" class="{{ 'active' if active=='documents' }}">Documents</a>
+    <a href="/ledger" class="{{ 'active' if active=='ledger' }}">Integrity Ledger</a>
+    <a href="/evidence" class="{{ 'active' if active=='evidence' }}">Evidence</a>
+    <a href="/metadata" class="{{ 'active' if active=='metadata' }}">Metadata Analysis</a>
+    <a href="/activity" class="{{ 'active' if active=='activity' }}">Activity Monitoring</a>
+    {% if user.role in ['Admin', 'Investigator'] %}
+    <a href="/cases" class="{{ 'active' if active=='cases' }}">Case Management</a>
+    <a href="/custody" class="{{ 'active' if active=='custody' }}">Chain of Custody</a>
+    {% endif %}
+    {% if user.role in ['Admin', 'Analyst'] %}
+    <a href="/evidence/verify" class="{{ 'active' if active=='evidence_verify' }}">Verify Evidence</a>
+    <a href="/vault" class="{{ 'active' if active=='vault' }}">Secure Vault</a>
+    {% endif %}
+    {% if user.role in ['Admin', 'Investigator', 'Analyst'] %}
+    <a href="/reports/verify-signature" class="{{ 'active' if active=='reports_verify' }}">Verify Report Signature</a>
+    {% endif %}
+    {% if user.role == 'Admin' %}
+    <a href="/users" class="{{ 'active' if active=='users' }}">User Management</a>
+    {% endif %}
+    <form method="post" action="/vault/lock" style="margin-top:10px;">
+        <button type="submit" style="background:#334155;width:100%;height:38px;">Lock Vault</button>
+    </form>
+    <a href="/logout" style="margin-top:10px;color:#fca5a5;">Logout ({{ user.username }})</a>
+</div>
+<div class="main-content">
+{% endif %}
+
+{% for message in messages %}
+<div class="{{ message.type }}">{{ message.text }}</div>
+{% endfor %}
+
+{% block content %}{% endblock %}
+
+{% if user %}
+</div>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Evidence Timeline - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Evidence Timeline</h1></div>
+
+{% if evidence_list %}
+<div class="card">
+    <form method="get" action="/evidence/timeline">
+        <label>Select Evidence</label>
+        <select name="evidence_id" onchange="this.form.submit()">
+            {% for e in evidence_list %}
+            <option value="{{ e.id }}" {{ 'selected' if e.id==selected_id }}>{{ e.id }} - {{ e.title }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% for row in timeline %}
+    <div class="{{ row.css_class }}">
+        <h3 style="margin:0 0 6px 0;">{{ row.icon }} {{ row.event }}</h3>
+        👤 <b>{{ row.user }}</b><br>
+        🌐 IP Address: {{ row.ip_address }}<br>
+        🕒 <b>{{ row.time }}</b>
+    </div>
+{% else %}
+    <div class="info">No timeline events recorded for this evidence yet.</div>
+{% endfor %}
+{% else %}
+<div class="info">No evidence has been uploaded yet.</div>
+{% endif %}
+{% endblock %}

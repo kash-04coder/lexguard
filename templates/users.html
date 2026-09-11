@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}User Management - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>User Management</h1></div>
+
+{% if message %}<div class="success">{{ message }}</div>{% endif %}
+
+<div class="metric-row">
+    <div class="metric-card"><div class="label">Admins</div><div class="value">{{ counts.Admin }}</div></div>
+    <div class="metric-card"><div class="label">Analysts</div><div class="value">{{ counts.Analyst }}</div></div>
+    <div class="metric-card"><div class="label">Viewers</div><div class="value">{{ counts.Viewer }}</div></div>
+    <div class="metric-card"><div class="label">Investigators</div><div class="value">{{ counts.Investigator }}</div></div>
+</div>
+
+<div class="card">
+    <form method="get" action="/users">
+        <label>Search User</label>
+        <input type="text" name="search" value="{{ search or '' }}" placeholder="Enter username...">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+{% for u in users %}
+<div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+    <div style="flex:2;min-width:150px;"><b>{{ u.username }}</b></div>
+    <form method="post" action="/users/update-role" style="flex:2;min-width:200px;display:flex;gap:8px;align-items:center;">
+        <input type="hidden" name="user_id" value="{{ u.id }}">
+        <select name="role" style="margin:0;">
+            {% for r in ["Viewer", "Analyst", "Investigator", "Admin"] %}
+            <option {{ 'selected' if r==u.role }}>{{ r }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="width:auto;padding:0 16px;">💾 Save</button>
+    </form>
+    <div style="flex:1;min-width:120px;">
+        {% if u.username == user.username %}
+        <div class="info" style="max-width:150px;">Current User</div>
+        {% else %}
+        <form method="post" action="/users/delete" style="max-width:120px;">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <button type="submit" style="background:#7f1d1d;">🗑 Delete</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+<div class="card">
+    <h3 style="margin-top:0;">➕ Create New User</h3>
+    <form method="post" action="/users/create">
+        <label>New Username</label>
+        <input type="text" name="username" required>
+        <label>New Password</label>
+        <input type="password" name="password" required>
+        <label>Role</label>
+        <select name="role">
+            <option>Admin</option><option>Investigator</option><option>Analyst</option><option selected>Viewer</option>
+        </select>
+        <button type="submit">Create User</button>
+    </form>
+</div>
+{% endblock %}

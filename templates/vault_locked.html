@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Vault Locked - LexGuard{% endblock %}
+{% block content %}
+<div class="container" style="max-width:420px;margin-top:80px;">
+    <div class="header-box"><h1>🔐 Secure Evidence Vault Locked</h1></div>
+    <p>Enter the vault master password to continue.</p>
+    <div class="card">
+        <form method="post" action="/vault/unlock">
+            <label>Master Password</label>
+            <input type="password" name="master_password" required>
+            <button type="submit" style="width:100%;">🔓 Unlock Vault</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

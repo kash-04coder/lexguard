@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Forensic Review - {{ document.title }}{% endblock %}
+
+{% block content %}
+<div class="header-box">
+    <h1>Forensic Verification</h1>
+    <p>{{ document.title }} · Case {{ document.case_id }} · v{{ verification.version_number }}</p>
+</div>
+
+<div class="card">
+    <h2>Overall Assessment</h2>
+    <p>Status:
+        <span class="badge {% if verification.status == 'PENDING_REVIEW' %}invalid{% else %}valid{% endif %}">
+            {{ verification.status }}
+        </span>
+    </p>
+    <p>Risk level: <strong>{{ verification.risk_level }}</strong></p>
+    <p>Risk score: <strong>{{ verification.risk_score }}/100</strong></p>
+</div>
+
+<div class="layout">
+    <div class="left">
+        <div class="card">
+            <h2>Forensic Indicators</h2>
+            <table>
+                <thead><tr><th>Module</th><th>Score</th></tr></thead>
+                <tbody>
+                    <tr><td>AI-generation screening</td><td>{{ verification.ai_score }}/100</td></tr>
+                    <tr><td>Pixel tamper screening</td><td>{{ verification.tamper_score }}/100</td></tr>
+                    <tr><td>Metadata anomalies</td><td>{{ verification.metadata_score }}/100</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>OCR / Extracted Content</h2>
+            <pre style="white-space:pre-wrap;">{{ verification.ocr_text }}</pre>
+        </div>
+
+        {% if verification.heatmap_path %}
+        <div class="card">
+            <h2>Suspicious Region Heatmap</h2>
+            <img src="/documents/{{ document.id }}/forensics/heatmap" alt="Tamper screening heatmap" style="max-width:100%; border-radius:10px;">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="right">
+        <div class="card">
+            <h2>Local AI Report</h2>
+            <p style="white-space:pre-wrap;">{{ verification.narrative }}</p>
+            <small>Generated locally using Ollama when available.</small>
+        </div>
+
+        <div class="card">
+            <h2>Review Action</h2>
+            <form method="post" action="/documents/{{ document.id }}/forensics/run">
+                <button type="submit">Run Forensic Scan Again</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

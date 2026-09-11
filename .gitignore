@@ -1,0 +1,6 @@
+__pycache__/
+.venv/
+uploads/
+
+report_signing.key
+secret.key

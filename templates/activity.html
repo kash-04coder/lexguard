@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Activity Monitoring - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Activity Monitoring</h1></div>
+
+<div class="metric-row">
+    <div class="metric-card"><div class="label">Total Activities</div><div class="value">{{ total }}</div></div>
+    <div class="metric-card"><div class="label">Today's Activities</div><div class="value">{{ today_count }}</div></div>
+    <div class="metric-card"><div class="label">Active Users</div><div class="value">{{ active_users }}</div></div>
+</div>
+
+<div class="card">
+    <form method="get" action="/activity" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:1;min-width:150px;"><label>User</label>
+        <select name="user">
+            {% for u in users %}<option {{ 'selected' if u==user_filter }}>{{ u }}</option>{% endfor %}
+        </select></div>
+        <div style="flex:1;min-width:150px;"><label>Action</label>
+        <select name="action">
+            {% for a in actions %}<option {{ 'selected' if a==action_filter }}>{{ a }}</option>{% endfor %}
+        </select></div>
+        <div style="flex:2;min-width:200px;"><label>Search Activity</label>
+        <input type="text" name="search" value="{{ search or '' }}"></div>
+        <div style="flex:1;min-width:100px;"><button type="submit">Filter</button></div>
+    </form>
+</div>
+
+{% for log in filtered %}
+    <div class="info">{{ log.icon }} <b>{{ log.timestamp }}</b><br>👤 {{ log.username }}<br>{{ log.action }}</div>
+{% else %}
+    <div class="info">No matching activity.</div>
+{% endfor %}
+
+<div style="margin-top:16px;">
+    <a href="/activity/export.csv?user={{ user_filter }}&action={{ action_filter }}&search={{ search }}">
+        <button type="button" onclick="window.location.href=this.parentElement.href">⬇ Export Activity Log</button>
+    </a>
+</div>
+{% endblock %}

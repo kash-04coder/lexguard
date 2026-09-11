@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Evidence Search - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Evidence Search Engine</h1></div>
+<div class="card">
+    <form method="get" action="/evidence/search">
+        <label>Search Evidence</label>
+        <input type="text" name="search_term" value="{{ search_term or '' }}"
+               placeholder="Case ID, title, filename, uploader, or SHA256">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+{% if search_term %}
+    {% if results %}
+    <div class="success">{{ results|length }} result(s) found</div>
+    <div class="card">
+        <table>
+            <thead><tr><th>ID</th><th>Case</th><th>Title</th><th>Filename</th><th>Uploaded By</th><th>Upload Time</th><th></th></tr></thead>
+            <tbody>
+            {% for r in results %}
+                <tr>
+                    <td>{{ r.id }}</td><td>{{ r.case_id }}</td><td>{{ r.title }}</td>
+                    <td>{{ r.filename }}</td><td>{{ r.uploaded_by }}</td><td>{{ r.upload_time }}</td>
+                    <td><a href="/evidence/details?evidence_id={{ r.id }}">View</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="warning">No matching evidence found</div>
+    {% endif %}
+{% endif %}
+{% endblock %}

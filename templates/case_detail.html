@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ case[2] }} - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box">
+    <h1>{{ case[2] }}</h1>
+    <p>{{ case[1] }} · Investigator: {{ case[4] }} · Priority: {{ case[5] }} · Status: {{ case[6] }}</p>
+</div>
+
+<div class="metric-row">
+    <div class="metric-card"><div class="label">Documents</div><div class="value">{{ documents|length }}</div></div>
+    <div class="metric-card"><div class="label">Evidence</div><div class="value">{{ stats[0] }}</div></div>
+    <div class="metric-card"><div class="label">Verified</div><div class="value">{{ stats[1] }}</div></div>
+    <div class="metric-card"><div class="label">Tamper Alerts</div><div class="value">{{ stats[3] }}</div></div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Edit Investigation</h2>
+    <form method="post" action="/cases/{{ case[1] }}/update">
+        <label>Case Name</label>
+        <input type="text" name="case_name" value="{{ case[2] }}">
+        <label>Description</label>
+        <textarea name="description" rows="3">{{ case[3] }}</textarea>
+        <label>Priority</label>
+        <select name="priority">
+        {% for p in ["Low","Medium","High","Critical"] %}
+            <option {{ "selected" if case[5]==p }}>{{ p }}</option>
+        {% endfor %}
+        </select>
+        <label>Status</label>
+        <select name="status">
+        {% for s in ["Open","Closed"] %}
+            <option {{ "selected" if case[6]==s }}>{{ s }}</option>
+        {% endfor %}
+        </select>
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Documents in this Case</h2>
+    <table>
+        <thead><tr><th>Title</th><th>Type</th><th>Version</th><th></th></tr></thead>
+        <tbody>
+        {% for doc in documents %}
+            <tr><td>{{ doc.title }}</td><td>{{ doc.doc_type }}</td><td>v{{ doc.current_version }}</td>
+                <td><a href="/documents/{{ doc.id }}">View →</a></td></tr>
+        {% else %}
+            <tr><td colspan="4">No documents linked to this case yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="/documents/new"><button>+ Add Document</button></a>
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Add Evidence to this Case</h2>
+    <form method="post" action="/cases/{{ case[1] }}/evidence/add" enctype="multipart/form-data">
+        <label>Evidence Title</label>
+        <input type="text" name="title" required>
+        <label>Upload Evidence</label>
+        <input type="file" name="evidence_file" required>
+        <button type="submit">Add Evidence</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2 style="margin-top:0;">Evidence in this Case</h2>
+    {% for e in case_evidence %}
+        <div class="card">
+            <b>📄 {{ e[1] }}</b><br>
+            <span style="color:#94a3b8;">Filename: {{ e[2] }} | Uploaded By: {{ e[3] }} | On: {{ e[4] }}</span>
+        </div>
+    {% else %}
+        <div class="card">No evidence in this case yet.</div>
+    {% endfor %}
+</div>
+
+{% if user.role == 'Admin' %}
+<div class="card">
+    <h2 style="margin-top:0;">Admin Actions</h2>
+    <div style="display:flex;gap:12px;">
+        {% if case[6] != 'Closed' %}
+        <form method="post" action="/cases/{{ case[1] }}/close" style="flex:1;">
+            <button type="submit">✅ Close &amp; Sign Case</button>
+        </form>
+        {% else %}
+        <a href="/cases/{{ case[1] }}/report" style="flex:1;">
+            <button type="button" onclick="window.location.href=this.parentElement.href">📄 Download Signed Case Report</button>
+        </a>
+        {% endif %}
+        <form method="post" action="/cases/{{ case[1] }}/delete" style="flex:1;">
+            <button type="submit" style="background:#7f1d1d;">🗑 Delete Case</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

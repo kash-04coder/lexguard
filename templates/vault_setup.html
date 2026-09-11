@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Configure Vault - LexGuard{% endblock %}
+{% block content %}
+<div class="container" style="max-width:480px;margin-top:60px;">
+    <div class="header-box"><h1>🔐 Configure Secure Evidence Vault</h1></div>
+    <div class="warning">The Secure Evidence Vault has not been configured yet.</div>
+    <p>Create a master password to protect access to the encrypted evidence vault.</p>
+    <div class="info">LexGuard does not store the master password. Only a
+    PBKDF2-HMAC-SHA256 derived value and a random salt are stored.</div>
+    <div class="card">
+        <form method="post" action="/vault/setup">
+            <label>Create Master Password</label>
+            <input type="password" name="master_password" required>
+            <label>Confirm Master Password</label>
+            <input type="password" name="confirm_master_password" required>
+            <button type="submit" style="width:100%;">🔒 Configure Vault</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

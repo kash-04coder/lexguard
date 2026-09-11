@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Vault - LexGuard{% endblock %}
+{% block content %}
+<div class="header-box"><h1>Encrypted Evidence Vault</h1></div>
+<div class="success">Vault unlocked. Encrypted evidence is accessible.</div>
+<div class="card">
+    <table>
+        <thead><tr><th>ID</th><th>Title</th><th>Encrypted Path</th></tr></thead>
+        <tbody>
+        {% for f in files %}
+            <tr><td>{{ f.id }}</td><td>{{ f.title }}</td><td>{{ f.encrypted_path }}</td></tr>
+        {% else %}
+            <tr><td colspan="3">No encrypted evidence is currently available.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
